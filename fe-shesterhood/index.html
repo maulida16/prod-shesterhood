@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="image/logo.svg" type="image/x-icon">
+    <title>Shesterhood</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Style -->
+    <link rel="stylesheet" href="../dist/output.css">
+
+    <!-- Slick Slider CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+
+    <!-- Tambahkan jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .carousel-card {
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .info {
+            display: none;
+        }
+        .info.active {
+            display: block;
+        }
+        .slick-slide > div {
+            margin-right: 48px; /* Atur jarak sesuai kebutuhan */
+        }
+        /* Mengubah warna dot aktif dan tidak aktif */
+        .slick-dots li button:before {
+            color: #F472B6; /* Warna pink untuk dot tidak aktif */
+        }
+
+        .slick-dots li.slick-active button:before {
+            color: #F1398F; /* Warna pink yang lebih terang atau berbeda untuk dot aktif */
+        }
+        /* Mengubah warna arrow prev dan next */
+        .slick-prev, .slick-next {
+            color: #F1398F; /* Warna pink untuk arrow */
+        }
+
+        .slick-prev:hover, .slick-next:hover {
+            color: #F472B6; /* Warna pink yang lebih terang saat hover */
+        }
+        .container {
+            background-repeat: no-repeat;
+            background-position: top left, top right;
+            background-size: 200px;
+        }
+        
+        .card-link {
+            transition: transform 0.3s ease;
+        }
+      
+        .card-link:hover {
+            transform: translateY(-5px);
+        }    
+        @media (max-width: 767px) {
+            section {
+                padding: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            section {
+                padding: 2rem;
+            }
+        }
+        
+    </style>
+
+    <!-- Slick Slider JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function handleCarousel() {
+                if (window.innerWidth >= 768) {
+                    // Aktifkan Slick Slider pada ukuran layar >= 768px
+                    if (!$('.carousel').hasClass('slick-initialized')) {
+                        $('.carousel').slick({
+                            dots: true,
+                            infinite: false,
+                            speed: 300,
+                            slidesToShow: 3, // Menampilkan 3 kartu sekaligus di layar besar
+                            slidesToScroll: 1,
+                        });
+                    }
+                } else {
+                    // Aktifkan Slick Slider pada ukuran layar < 768px dengan satu kartu per slide
+                    if (!$('.carousel').hasClass('slick-initialized')) {
+                        $('.carousel').slick({
+                            dots: true,
+                            infinite: false,
+                            speed: 300,
+                            slidesToShow: 1, // Menampilkan 1 kartu per slide di layar kecil
+                            slidesToScroll: 1,
+                        });
+                    }
+                }
+            }
+
+            // Panggil fungsi ketika halaman pertama kali dimuat
+            handleCarousel();
+
+            // Panggil fungsi ketika ukuran layar berubah
+            window.addEventListener('resize', function() {
+                // Untuk menghindari duplikasi slider saat resize, kita perlu reinitialize
+                if ($('.carousel').hasClass('slick-initialized')) {
+                    $('.carousel').slick('unslick');
+                }
+                handleCarousel();
+            });
+
+            // Button click functionality
+            document.querySelectorAll('.btn-info').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.info').forEach(info => {
+                        info.classList.remove('active');
+                    });
+                    const target = document.querySelector(this.getAttribute('data-target'));
+                    target.classList.add('active');
+                });
+            });
+
+        const cardContainer = document.getElementById('card-container');
+        const paginationContainer = document.getElementById('pagination');
+      
+      let currentPage = 1;
+      const cardsPerPage = 9;
+      
+      async function fetchCards() {
+        const response = await fetch('/api/cards');
+        const data = await response.json();
+        return data;
+      }
+      
+      function renderCards(cards) {
+        cardContainer.innerHTML = '';
+        cards.forEach(card => {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'bg-white shadow rounded-lg overflow-hidden card-link';
+            cardElement.innerHTML = `
+                <a href="${card.registrationLink}" class="block">
+                <img src="${card.imagePath}" alt="${card.title}" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="font-bold text-lg mb-2">${card.title}</h3>
+                    <p class="text-gray-600 mb-2">${card.caption}</p>
+                    <div class="flex flex-wrap gap-2 text-sm text-gray-500">
+                    <span class="bg-gray-200 px-2 py-1 rounded">${card.Category || 'Unknown Category'}</span>
+                    <span class="bg-gray-200 px-2 py-1 rounded">${card.Subcategory || 'Unknown Subcategory'}</span>
+                    </div>
+                </div>
+                </a>
+            `;
+            cardContainer.appendChild(cardElement);
+        });
+    }
+        fetch('/api/public-events')
+        .then(response => response.json())
+        .then(cards => {
+            console.log(cards);  // Cek apakah data sudah benar
+            renderCards(cards);
+        })
+        .catch(error => console.error('Error fetching events:', error));
+      
+      function renderPagination(totalCards) {
+        paginationContainer.innerHTML = '';
+        const totalPages = Math.ceil(totalCards / cardsPerPage);
+      
+        for (let i = 1; i <= totalPages; i++) {
+          const pageLink = document.createElement('li');
+          pageLink.innerHTML = `
+            <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">${i}</a>
+          `;
+          pageLink.addEventListener('click', () => {
+            currentPage = i;
+            fetchAndRenderCards();
+          });
+          paginationContainer.appendChild(pageLink);
+        }
+      }
+      
+      async function fetchAndRenderCards() {
+        const cards = await fetchCards();
+        const startIndex = (currentPage - 1) * cardsPerPage;
+        const endIndex = startIndex + cardsPerPage;
+        renderCards(cards.slice(startIndex, endIndex));
+        renderPagination(cards.length);
+      }
+      
+      fetchAndRenderCards();
+
+    });
+    </script>
+
+</head>
+<body>
+    <nav class="fixed py-6 px-8 w-full bg-white z-50" x-data="navbar()">
+        <div class="container mx-auto">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <img src="image/logo.svg" alt="Logo" class="order-1 lg:order-1">
+                
+                <!-- Toggle Button for Mobile -->
+                <div class="lg:hidden flex items-center justify-between p-4 sm:order-2">
+                    <img @click="navOpen = !navOpen" src="image/toggle.svg" alt="Toggle Menu" class="cursor-pointer h-8">
+                </div>
+    
+                <!-- Navbar Links for Desktop -->
+                <div class="hidden lg:block order-3">
+                    <ul class="flex gap-16">
+                        <li :class="activeSection === 'home' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#home" @click="scrollToSection('home')">Home</a>
+                        </li>
+                        <li :class="activeSection === 'about' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#about" @click="scrollToSection('about')">About</a>
+                        </li>
+                        <li :class="activeSection === 'programs' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#programs" @click="scrollToSection('programs')">Programs</a>
+                        </li>
+                        <li :class="activeSection === 'events' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#events" @click="scrollToSection('events')">Events</a>
+                        </li>
+                        <li :class="activeSection === 'contact' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#contact" @click="scrollToSection('contact')">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+    
+                <!-- Sliding Menu for Mobile -->
+                <div 
+                    x-show="navOpen"
+                    @click.away="navOpen = false"
+                    x-transition:enter="transform transition ease-out duration-300"
+                    x-transition:enter-start="translate-y-full opacity-0"
+                    x-transition:enter-end="translate-y-0 opacity-100"
+                    x-transition:leave="transform transition ease-in duration-300"
+                    x-transition:leave-start="translate-y-0 opacity-100"
+                    x-transition:leave-end="translate-y-full opacity-0"
+                    class="fixed bottom-0 right-0 left-0 px-4 py-4 bg-white rounded-tr-lg rounded-tl-lg"
+                >
+                    <ul class="flex flex-col items-center space-y-4 p-4">
+                        <li :class="activeSection === 'home' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#home" @click="scrollToSection('home'); navOpen = false">Home</a>
+                        </li>
+                        <li :class="activeSection === 'about' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#about" @click="scrollToSection('about'); navOpen = false">About</a>
+                        </li>
+                        <li :class="activeSection === 'programs' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#programs" @click="scrollToSection('programs'); navOpen = false">Programs</a>
+                        </li>
+                        <li :class="activeSection === 'events' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#events" @click="scrollToSection('events'); navOpen = false">Events</a>
+                        </li>
+                        <li :class="activeSection === 'contact' ? 'text-pink font-bold' : 'text-grey2 font-medium'" class="transition-colors duration-300">
+                            <a href="#contact" @click="scrollToSection('contact'); navOpen = false">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <script>
+        function navbar() {
+            return {
+                navOpen: false,
+                activeSection: '',
+                init() {
+                    // Update active section on scroll
+                    window.addEventListener('scroll', () => {
+                        const sections = ['home', 'about', 'events', 'programs', 'contact'];
+                        sections.forEach(section => {
+                            const element = document.getElementById(section);
+                            if (element && element.getBoundingClientRect().top < window.innerHeight / 2) {
+                                this.activeSection = section;
+                            }
+                        });
+                    });
+                },
+                scrollToSection(section) {
+                    document.getElementById(section).scrollIntoView({ behavior: 'smooth' });
+                    this.activeSection = section;
+                    this.navOpen = false;
+                }
+            }
+        }
+    </script>
+    
+        
+
+    <!-- Section Hero -->
+    <section id="home" class="py-0 px-0">
+        <div class="pt-24 pb-12 lg:pt-24 lg:pb-12 md:pt-16 md:pb-8 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 bg-grey items-center lg: w-full">
+                <!-- Gambar Hero -->
+                <div class="p-4 pt-0 pr-9 pb-9 pl-9 lg:pt-16 lg:pr-16 lg:pb-10 lg:pl-0 bg-grey">
+                    <img src="image/bg-hero.png" alt="Hero Image" class="w-full h-full object-cover ">
+                </div>
+                <!-- Teks -->
+                <div class="p-4 pt-0 pr-9 pb-9 pl-9 lg:pt-16 lg:pr-16 lg:pb-16 lg:pl-0 bg-grey">
+                    <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-center lg:text-left mb-4 text-pink">
+                        <span class="text-green">Join Shesther:</span> Where Passion Meets Community
+                    </h1>
+                    <p class="text-base text-center md:text-l lg:text-xl lg:text-left text-gray-700">
+                        Enroll in diverse classes and discover new skills, friendships, and unforgettable experiences!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Section About1 -->
+     <section id="about" class="lg:flex md:flex px-8 pb-16 lg:py-8 lg:px-16 gap-2 w-full">
+        <div class="flex justify-start py-2 px-12 lg:py-4 lg:px-4 gap-4">
+            <img class="w-12 h-12 lg:w-16 lg:h-16" src="image/celebrate-icon.svg" alt="">
+            <div class="items-center mb-2">
+                <h3 class="text-black font-bold text-base lg:text-xl">Celebrate Shestherhood</h3>
+                <p class="text-grey2 font-medium text-sm lg:text-base">where every moment is a journey of growth and community</p>
+            </div>
+        </div>
+        <div class="flex justify-start mb-2 py-2 px-12 lg:py-4 lg:px-4 gap-4">
+            <img class="w-12 h-12 lg:w-16 lg:h-16" src="image/embrace-icon.svg" alt="">
+            <div class="items-center">
+                <h3 class="text-black font-bold text-base lg:text-xl">Embrace Shestherhood</h3>
+                <p class="text-grey2 font-medium text-sm lg:text-base">a vibrant community built on passion, creativity, and solidarity.</p>
+            </div>
+        </div>
+        <div class="flex justify-start py-2 px-12 lg:py-4 lg:px-4 gap-4">
+            <img class="w-12 h-12 lg:w-16 lg:h-16" src="image/discover-icon.svg" alt="">
+            <div class="items-center">
+                <h3 class="text-black font-bold text-base lg:text-xl">Discover Shestherhood</h3>
+                <p class="text-grey2 font-medium text-sm lg:text-base">each member contributes to a tapestry of shared experiences and boundless inspiration</p>
+            </div>
+        </div>
+     </section>
+
+    <!-- Section About2 -->
+    <section class="bg-salem px-4 py-12 lg:px-12 py:24 w-full">
+        <div class="container mx-auto grid grid-flow-col flex-col lg:grid-flow-row lg:flex-row gap-16">
+            <div class="lg:flex lg:items-center"> <!-- Kurangi jarak dengan gap-8 -->
+                <!-- Gambar About -->
+                <div class="order-1 lg:order-2">
+                    <img src="image/about2.png" alt="About Image" class="w-full h-auto lg:w-full object-cover">
+                </div>
+                <!-- Teks -->
+                <div class="order-2 lg:order-1 p-4 lg:p-0 lg:pl-8">
+                    <h1 class="text-2xl lg:text-4xl font-bold mb-4 text-green">
+                        Welcome to <span class="text-pink">Shesterhood</span>, a learning community based in Kudus!
+                    </h1>
+                    <p class="text-base lg:text-lg text-gray-700 leading-tight">
+                        <br> We are a place for anyone who wants to learn together and share knowledge.<br>
+                        <br> At <span class="text-pink font-bold">Shestherhood,</span> we encourage you to participate in our community and events in any supportive role that suits you.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Programs -->
+     <section class="w-full">
+        <div class="grid grid-rows-2 px-12 py-3 mt-4 mb-4 lg:px-16 mx-auto gap-0 lg:gap-2" >
+            <p class="font-medium text-sm lg:text-base text-grey2">SHESTERHOOD PROGRAMS</p>
+            <h1 class="font-bold text-xl lg:text-2xl text-black">Explore Our Exciting Programs at Shesterhood!</h2>
+        </div>
+     </section>
+    
+    <!-- Section Carousel -->
+    <section id="programs" class="bg-salem z-10 w-full mx-auto px-8 py-12 md:px-16 md:py-16 lg:px-16 lg:py-16  overflow-hidden">
+        <div class="carousel grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4 bg-salem lg:px-4 w-full">
+            
+            <!-- Carousel SHE-Talks  -->
+            <div class="carousel-card h-auto lg:w-[360px] flex flex-wrap justify-start gap-3 md:mr-8 lg:mr-12 overflow-hidden min-h-[960px] max-h-[960px]" x-data="{ activeInfo: 'info-1' }">
+                <img class="px-0 mb-4 w-full h-auto md:w-[360px] lg:w-[480px]" src="image/she-talks.png" alt="">
+                    <div class="px-4">
+                        <div class="flex gap-4 px-2 mb-4">
+                            <button @click="activeInfo = 'info-1'" :class="activeInfo === 'info-1' ? 'bg-green text-white' : 'bg-white text-green'" class="text-sm rounded-xl px-4 py-2 lg:px-2 lg:py-2 max-w-max drop-shadow-sm">Membership</button>
+                            <button @click="activeInfo = 'info-2'" :class="activeInfo === 'info-2' ? 'bg-green text-white' : 'bg-white text-green'" class="text-sm rounded-xl px-4 py-2 lg:px-2 lg:py-2 max-w-max drop-shadow-sm">Non Membership</button>
+                        </div>
+                        <div class="px-4 mb-4">
+                            <h2 class="text-xl font-bold text-pink mb-2">SHE-Talks</h2>
+                            <p class="text-base font-normal text-grey2 text-left max-w-max">The webinar series designed to inspire and educate women.</p>
+                        </div>
+                        
+                        <!-- Membership Info -->
+                        <div class="min-h-[580px] max-h-[640px]"x-show="activeInfo === 'info-1'" x-cloak>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/clock-icon.svg" alt="">
+                                <p>Tentative</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/location-icon.svg" alt="">
+                                <p>Online</p>
+                            </div>
+                            <p class="px-4 mb-4 font-bold">Benefits:</p>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/certificate.icon.svg" alt="">
+                                <p>E-Certificate</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/recording-icon.svg" alt="">
+                                <p>All-time materials recording</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/materials-icon.svg" alt="">
+                                <p>Materials including 5-10 video series</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/whatsapp-icon.svg" alt="">
+                                <p>Alumni Whatsapp Groups</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/mentor-icon.svg" alt="">
+                                <p>All-time mentoring with tutor</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/invitation-icon.svg" alt="">
+                                <p>Free invitation of non-membership webinar</p>
+                            </div>
+                        </div>
+
+                        <!-- Non Membership Info -->
+                        <div class="min-h-[580px] max-h-[640px]" x-show="activeInfo === 'info-2'" x-cloak>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/clock-icon.svg" alt="">
+                                <p>Tentative</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/location-icon.svg" alt="">
+                                <p>Online</p>
+                            </div>
+                            <p class="px-4 mb-4 font-bold">Benefits:</p>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/certificate.icon.svg" alt="">
+                                <p>E-Certificate</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/hourglass-icon.svg" alt="">
+                                <p>2 Hours webinar</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/recording-icon.svg" alt="">
+                                <p>All-time webinar recording</p>
+                            </div>
+                            <div class="px-4 mb-4 flex-row flex gap-2">
+                                <img src="image/inspiration-icon.svg" alt="">
+                                <p>Educative and Inspiring Topics</p>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+            <!-- Carousel SHE-Class  -->
+            <div class="carousel-card h-auto lg:w-[360px] flex flex-wrap  justify-start gap-3 md:mr-8 lg:mr-12 overflow-hidden min-h-[960px] max-h-[960px]" x-data="{ activeInfo: 'info-1' }">
+                <img class="px-0 mb-4 w-full h-auto lg:w-[360px]" src="image/she-class.png" alt="">
+                <div class="px-4">
+                    <div class="flex gap-4 px-2 mb-4">
+                        <button @click="activeInfo = 'info-1'" :class="activeInfo === 'info-1' ? 'bg-green text-white' : 'bg-white text-green'" class="text-sm rounded-xl px-4 py-2 lg:px-2 lg:py-2 max-w-max drop-shadow-sm">Business</button>
+                        <button @click="activeInfo = 'info-2'" :class="activeInfo === 'info-2' ? 'bg-green text-white' : 'bg-white text-green'" class="text-sm rounded-xl px-4 py-2 lg:px-2 lg:py-2 max-w-max drop-shadow-sm">Non Business</button>
+                    </div>
+                    <div class="px-4 mb-4">
+                        <h2 class="text-xl font-bold text-pink mb-2">SHE-Class</h2>
+                        <p class="text-base font-normal text-grey2 text-left max-w-max">Personalize your class and be expert on it!</p>
+                    </div>
+                    
+                    <!-- Business Info -->
+                    <div class="min-h-[580px] max-h-[640px]"x-show="activeInfo === 'info-1'" x-cloak>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/clock-icon.svg" alt="">
+                            <p>As Requested</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/location-icon.svg" alt="">
+                            <p>Offline (1-3 Person)</p>
+                        </div>
+                        <p class="px-4 mb-4 font-bold">Benefits:</p>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/certificate.icon.svg" alt="">
+                            <p>E-Certificate</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/class_icon.svg" alt="">
+                            <p>Class Kit</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/personal-icon.svg" alt="">
+                            <p>Personal Class</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/materials-icon.svg" alt="">
+                            <p>Topics including business tips</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/mentor-icon.svg" alt="">
+                            <p>All-time mentoring with tutor</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/whatsapp-icon.svg" alt="">
+                            <p>Alumni Whatsapp Groups</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/mentor-icon.svg" alt="">
+                            <p>All time mentoring with tutor</p>
+                        </div>
+                    </div>
+
+                    <!-- Non-Business Info -->
+                    <div class="min-h-[580px] max-h-[640px]"x-show="activeInfo === 'info-2'" x-cloak>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/clock-icon.svg" alt="">
+                            <p>As Requested</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/location-icon.svg" alt="">
+                            <p>Offline (1-3 Person)</p>
+                        </div>
+                        <p class="px-4 mb-4 font-bold">Benefits:</p>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/certificate.icon.svg" alt="">
+                            <p>E-Certificate</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/class_icon.svg" alt="">
+                            <p>Class Kit</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/personal-icon.svg" alt="">
+                            <p>Personal Class</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel SHE-Gath  -->
+            <div class="carousel-card h-auto lg:w-[360px] flex flex-wrap  justify-start gap-3 md:mr-8 lg:mr-12 overflow-hidden min-h-[960px] max-h-[960px]" x-data="{ activeInfo: 'info-1' }">
+                <img class="px-0 mb-4 w-full h-auto lg:w-[360px]" src="image/she-gath2.png" alt="">
+                <div class="px-4">
+                    <div class="flex gap-4 px-2 mb-4">
+                        <button @click="activeInfo = 'info-1'" :class="activeInfo === 'info-1' ? 'bg-green text-white' : 'bg-white text-green'" class="text-sm rounded-xl px-8 py-4 lg:px-8 lg:py-2 max-w-max drop-shadow-sm">Paid</button>
+                    </div>
+                    <div class="px-4 mb-4">
+                        <h2 class="text-xl font-bold text-pink mb-2">SHE-Gath</h2>
+                        <p class="text-base font-normal text-grey2 text-left max-w-max">Exciting fun and growth activities.</p>
+                    </div>
+                    
+                    <!-- Paid Info -->
+                    <div class="min-h-[580px] max-h-[640px]"x-show="activeInfo === 'info-1'" x-cloak>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/clock-icon.svg" alt="">
+                            <p>Every Weekend</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/location-icon.svg" alt="">
+                            <p>Offline</p>
+                        </div>
+                        <p class="px-4 mb-4 font-bold">Benefits:</p>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/class_icon.svg" alt="">
+                            <p>Workshop Kit</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/fun-icon.svg" alt="">
+                            <p>Fun class and networking</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel SHE-Sport -->
+            <div class="carousel-card h-auto lg:w-[360px] flex flex-wrap  justify-start gap-3 md:mr-8 lg:mr-12 overflow-hidden min-h-[960px] max-h-[960px]" x-data="{ activeInfo: 'info-1' }">
+                <img class="px-0 mb-4 w-full h-auto lg:w-[360px]" src="image/she-sport2.png" alt="">
+                <div class="px-4">
+                    <div class="flex gap-4 px-2 mb-4">
+                        <button @click="activeInfo = 'info-1'" :class="activeInfo === 'info-1' ? 'bg-green text-white' : 'bg-white text-green'" class="text-sm rounded-xl px-8 py-4 lg:px-8 lg:py-2 max-w-max drop-shadow-sm">Paid</button>
+                    </div>
+                    <div class="px-4 mb-4">
+                        <h2 class="text-xl font-bold text-pink mb-2 w-full">SHE-Sport</h2>
+                        <p class="text-base font-normal text-grey2 text-left max-w-max">Your gateway to healthier, happier, and more confident of you.</p>
+                    </div>
+                    
+                    <!-- Paid Info -->
+                    <div class="min-h-[580px] max-h-[640px]"x-show="activeInfo === 'info-1'" x-cloak>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/clock-icon.svg" alt="">
+                            <p>Every Weekend</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/location-icon.svg" alt="">
+                            <p>Offline</p>
+                        </div>
+                        <p class="px-4 mb-4 font-bold">Benefits:</p>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/fun-icon.svg" alt="">
+                            <p>Fun Sport</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Carousel SHE-Share  -->
+            <div class="carousel-card h-auto lg:w-[360px] flex flex-wrap  justify-start gap-3 md:mr-8 lg:mr-12 overflow-hidden min-h-[960px] max-h-[960px]" x-data="{ activeInfo: 'info-1' }">
+                <img class="px-0 mb-4 w-full h-auto lg:w-[360px]" src="image/she-share.png" alt="">
+                <div class="px-4">
+                    <div class="flex gap-4 px-2 mb-4">
+                        <button @click="activeInfo = 'info-1'" :class="activeInfo === 'info-1' ? 'bg-green text-white' : 'bg-white text-green'" class="text-sm rounded-xl px-8 py-4 lg:px-8 lg:py-2 max-w-max drop-shadow-sm">Free</button>
+                    </div>
+                    <div class="px-4 mb-4">
+                        <h2 class="text-xl font-bold text-pink mb-2">SHE-Share</h2>
+                        <p class="text-base font-normal text-grey2 text-left max-w-max">Spreading Happiness, Making the Impact.</p>
+                    </div>
+                    
+                    <!-- Paid Info -->
+                    <div class="min-h-[580px] max-h-[640px]"x-show="activeInfo === 'info-1'" x-cloak>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/clock-icon.svg" alt="">
+                            <p>Tentative</p>
+                        </div>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/location-icon.svg" alt="">
+                            <p>Offline</p>
+                        </div>
+                        <p class="px-4 mb-4 font-bold">Benefits:</p>
+                        <div class="px-4 mb-4 flex-row flex gap-2">
+                            <img src="image/fun-icon.svg" alt="">
+                            <p>Fun activities</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Events -->
+    <section class="w-full">
+        <div class="grid grid-rows-2 px-12 py-3 mt-4 mb-4 lg:px-16 mx-auto gap-0 lg:gap-2" >
+            <p class="font-medium text-sm lg:text-base text-grey2">SHESTERHOOD EVENTS & CLASSES</p>
+            <h1 class="font-bold text-xl lg:text-2xl text-black">Finds out what’s exciting for you!</h2>
+        </div>
+    </section>
+
+    <!-- Section Class and Events  -->
+    <section class="bg-orange bg-[url('image/bunga1.png')] w-full">
+    <div id="events" class="container mx-auto px-4 py-12 md:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 rounded-lg" id="card-container">
+            <!-- Events Card -->
+            <div class="px-3 py-4 lg:px-8 lg:py-6 bg-white rounded-3xl">
+                <img src="image/poundfit.png" alt="" class="mb-4 lg:mb-8">
+                <div class="flex mb-4 lg:mb-8 gap-3 lg:gap-2">
+                    <div class="bg-pink drop-shadow-sm px-2 py-1  lg:px-8 lg:py-3 text-sm font-medium text-white rounded-full">SHE-Sport</div>
+                    <div class="bg-green drop-shadow-sm px-2 py-1 lg:px-8 lg:py-3 text-sm font-medium text-white rounded-full">Paid</div>
+                </div>
+                <h1 class="text-xl font-bold text-black mb-1">Fun Poundfit</h1>
+                <h2 class="text-lg font-bold text-grey2 mb-1">24 Agustus 2024</h2>
+                <p class="text-sm font-normal text-grey2 mb-4">Biaya Registrasi Rp 50.000/orang</p>
+                <button class="bg-orange drop-shadow-sm px-6 py-3 lg:px-6 lg:py-4 text-lg font-bold text-white w-full rounded-full"><a href="https://docs.google.com/forms/d/e/1FAIpQLSfkhKFNb4MZQWKZLPwFtSxzF4Icqlh2RniRqzWfM5TEEzUOUw/viewform?usp=send_form" target="_blank" rel="noopener noreferrer">Book Now!</a></button>
+            </div>
+       
+            <div class="px-3 py-4 lg:px-8 lg:py-9 bg-white rounded-3xl">
+                <img src="image/pipe-cleaner.png" alt="" class="mb-4 lg:mb-8">
+                <div class="flex mb-4 lg:mb-8 gap-3 lg:gap-2">
+                    <div class="bg-pink drop-shadow-sm px-2 py-1 lg:px-4 lg:py-2 text-sm font-medium text-white rounded-full">SHE-Gath</div>
+                    <div class="bg-green drop-shadow-sm px-2 py-1 lg:px-4 lg:py-2 text-sm font-medium text-white rounded-full">Paid</div>
+                </div>
+                <h1 class="text-xl font-bold text-black mb-1">Pipe Cleaner Flower Bag</h1>
+                <h2 class="text-lg font-bold text-grey2 mb-1">24 Agustus 2024</h2>
+                <p class="text-sm font-normal text-grey2 mb-4">Biaya Registrasi Rp 110.000/orang</p>
+                <button class="bg-orange drop-shadow-sm px-6 py-3 lg:px-6 lg:py-4 text-lg font-bold text-white w-full rounded-full"><a href="https://docs.google.com/forms/d/e/1FAIpQLSes2HO_H-eJ-XAZGWt3KYld0npZmM0wuIDPTBPz0H73X5_89Q/viewform?usp=send_form" target="_blank" rel="noopener noreferrer">Book Now!</a></button>
+            </div>
+
+            <div class="px-3 py-4 lg:px-8 lg:py-9 bg-white rounded-3xl">
+                <img src="../public/image/cake-decor.png" alt="" class="mb-4 lg:mb-8">
+                <div class="flex mb-4 lg:mb-8 gap-3 lg:gap-2">
+                    <div class="bg-pink drop-shadow-sm px-2 py-1 lg:px-4 lg:py-2 text-sm font-medium text-white rounded-full">SHE-Gath</div>
+                    <div class="bg-green drop-shadow-sm px-2 py-1 lg:px-4 lg:py-2 text-sm font-medium text-white rounded-full">Paid</div>
+                </div>
+                <h1 class="text-xl font-bold text-black mb-1">Cake Decoration</h1>
+                <h2 class="text-lg font-bold text-grey2 mb-1">31 Agustus 2024</h2>
+                <p class="text-sm font-normal text-grey2 mb-4">Biaya Registrasi Rp 120.000/orang</p>
+                <button class="bg-orange drop-shadow-sm px-6 py-3 lg:px-6 lg:py-4 text-lg font-bold text-white w-full rounded-full"><a href="https://docs.google.com/forms/d/e/1FAIpQLSes2HO_H-eJ-XAZGWt3KYld0npZmM0wuIDPTBPz0H73X5_89Q/viewform?usp=send_form" target="_blank" rel="noopener noreferrer">Book Now!</a></button>
+            </div>
+
+
+        </div>
+      
+        <!-- Pagination -->
+        <div class="mt-8 flex justify-center">
+          <nav aria-label="Page navigation">
+            <ul class="inline-flex -space-x-px" id="pagination">
+              <!-- Pagination buttons will be dynamically rendered here -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Contact -->
+    <section id="contact" class="px-0 py-0">
+        <div class="bg-green mx-auto px-12 py-36 text-center justify-center">
+            <h1 class="text-white font-bold text-5xl text-center mb-8">Interested to be our partner?</h1>
+            <p class="text-white font-normal text-xl mb-12 text-center">Shestherhood invites you to become our partner, <br class="lg">whether as a teacher, donor, or in any other supportive role. </p>
+            <button class="px-4 py-2 bg-orange drop-shadow-sm rounded-full font-bold text-white text-lg"><a href="https://api.whatsapp.com/send?phone=6285156943973&text=Hello%20Shesterhood!%20Aku%20mau%20join%20jadi%20(pengajar%2C%20donatur%2C%20relawan)..." target="_blank" rel="noopener noreferrer"></a>Join Us!</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-pink text-white py-8 px-2 lg:px-16 lg:py-12 text-center w-full">
+        <div class="lg:flex md:flex px-8 py-4 justify-between">
+            <div class="mb-4">
+                <h1 class="text-lg lg:text-xl font-bold text-left text-white mb-1 lg:mb-3">Social Media</h1>
+                <div class="flex gap-4 mb-2">
+                    <img src="../public/image/footer-instagram.svg" alt="">
+                    <a class="font-medium text-white" href="https://www.instagram.com/shesterhood/" target="_blank" rel="noopener noreferrer">@shesterhood</a>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h1 class="text-lg lg:text-xl font-bold text-left text-white mb-1 lg:mb-3">Our Email</h1>
+                <div class="flex gap-4 mb-2">
+                    <img src="../public/image/footer-email.svg" alt="">
+                    <a class="font-medium text-white" href="she.sisterhoodd@gmail.com" target="_blank" rel="noopener noreferrer">she.sisterhoodd@gmail.com</a>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h1 class="text-lg lg:text-xl font-bold text-left text-white mb-1 lg:mb-3">Contact Us</h1>
+                <div class="flex gap-4 mb-8">
+                    <img src="../public/image/footer-whatsapp.svg" alt="">
+                    <a class="font-medium text-white" href="https://api.whatsapp.com/send?phone=6285156943973&text=Hello%20Shesterhood!%20Aku%20mau%20join%20jadi%20(pengajar%2C%20donatur%2C%20relawan)..." target="_blank" rel="noopener noreferrer">0851-5694-3973</a>
+                </div>
+            </div>
+        </div>
+        <p class="font-normal text-sm">Copyright © 2024 Shesterhood</p>
+    </footer>
+
+
+    <!-- Alpine js -->
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+
+
+    
+</body>
+</html>

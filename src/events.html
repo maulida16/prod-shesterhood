@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../public/image/logo.svg" type="image/x-icon">
+    <title>Shesterhood Events</title>
+    <link href="/dist/output.css" rel="stylesheet">
+    <style>
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FFFFFF;
+            padding: 1rem;
+            color: white;
+        }
+        .header img {
+            height: 50px; /* Sesuaikan dengan ukuran logo */
+        }
+        .header .logout-btn {
+            background-color: white;
+            color: #F1398F;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .header .logout-btn:hover {
+            background-color: #e0e0e0;
+        }
+        .add-event-btn {
+            background-color: #FFA43A;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .add-event-btn:hover {
+            background-color: #d1297e;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+        }
+        .header-container h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #F1398F; /* Warna judul sesuai dengan tema pink */
+        }
+        .header-container .button-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .header-container .button-group button {
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+        }
+        thead {
+            background-color: #F1398F;
+            color: white;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: #fff;
+        }
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .action-buttons img {
+            width: 32px;
+            height: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="../public/image/logo.svg" alt="Shesterhood Logo">
+        <button class="logout-btn">Logout</button>
+    </div>
+    <div class="container mx-auto p-4">
+        <div class="header-container">
+            <h1 class="font-bold">Shesterhood Events</h1>
+            <div class="button-group">
+                <a href="addEvents.html" class="add-event-btn bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-700">Add Event</a>
+            </div>
+        </div>
+        <table class="min-w-full bg-white border border-gray-200">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Caption</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Subcategory</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="eventsTableBody">
+                <!-- Data akan dimuat di sini -->
+            </tbody>
+        </table>
+    </div>
+    <script src="events.js"></script> <!-- Pastikan jalur ini sesuai dengan lokasi events.js -->
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../public/image/logo.svg" type="image/x-icon">
+    <title>Login - Shesterhood</title>
+    <link href="/dist/output.css" rel="stylesheet"> <!-- Pastikan path ke CSS Tailwind sudah benar -->
+    <style>
+    .center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        padding: 512px;
+    }
+    input:focus {
+        border: 2px solid #F1398F;
+    }
+    .input-container {
+        position: relative;
+    }
+    .input-container input {
+        padding-right: 2.5rem; /* Ruang untuk ikon di sebelah kanan */
+    }
+    .input-container .toggle-icon {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 1.5rem; /* Ukuran ikon */
+        color: #6B7280; /* Warna ikon */
+    }
+    </style>
+</head>
+<body> <!-- Tambahkan padding dan margin nol -->            
+    <div class="center">
+        <img src="../public/image/logo.svg" class="mb-8 w-full" alt="Logo">
+        <h2 class="text-2xl font-bold text-center text-pink">Login to Shesterhood</h2>
+        <form id="loginForm" class="space-y-6 w-full">
+            <div class="mb-4 mt-8">
+                <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                <input type="text" id="username" name="username" required class="w-full h-12 p-4 mb-2 border rounded-lg focus:outline-none focus:border-pink focus:ring-2">
+            </div>
+            <div class="mb-4 input-container relative">
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="password" name="password" required class="w-full h-12 p-4 mb-2 border rounded-lg focus:outline-none focus:border-pink focus:ring-2">
+                <span id="togglePassword" class="toggle-icon mr-4" aria-label="Toggle Password Visibility">
+                    <span id="eyeIcon" class="text-gray-500">🙈</span>
+                    <span id="eyeIconOpen" class="hidden text-gray-500">🙉</span>
+                </span>
+            </div>
+            <div>
+                <button type="submit" class="w-full px-4 py-2 font-bold text-white bg-orange rounded-full hover:bg-pink focus:outline-none focus:ring-2 focus:ring-pink focus:ring-opacity-50">Login</button>
+                <p id="error-message" class="hidden text-red-500"></p>
+
+            </div>
+        </form>
+        <div id="error-message" class="text-red-500 text-sm text-center hidden"></div>
+    </div>
+    <script src="login.js"></script> <!-- Sambungkan ke script JavaScript -->
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        const eyeIcon = document.querySelector('#eyeIcon');
+        const eyeIconOpen = document.querySelector('#eyeIconOpen');
+
+        togglePassword.addEventListener('click', function () {
+            // Toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // Toggle the eye icon
+            eyeIcon.classList.toggle('hidden');
+            eyeIconOpen.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

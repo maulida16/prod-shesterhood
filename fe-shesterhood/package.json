@@ -1,0 +1,26 @@
+{
+  "name": "fe-shesterhood",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "tailwindcss": "^3.4.10"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.20",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4",
+    "postcss": "^8.4.41",
+    "slick-carousel": "^1.8.1"
+  }
+}

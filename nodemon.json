@@ -1,0 +1,7 @@
+{
+    "watch": ["be-shesterhood", "fe-shesterhood"],
+    "ext": "js,json,html,css",
+    "ignore": ["be-shesterhood/**/*.test.js"],
+    "exec": "node be-shesterhood/app.js"
+  }
+  
