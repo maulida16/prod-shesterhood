@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchEvents() {
         try {
-            const response = await fetch('http://localhost:8080/api/public-events');
+            const response = await fetch('https://shesterhood.com/api/public-events');
             if (!response.ok) throw new Error('Network response was not ok.');
             const events = await response.json();
 

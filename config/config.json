@@ -14,9 +14,9 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": "",
-    "database": "db_shesterhood_production",
+    "username": "shen5725_shesterhood",
+    "password": "Shesterh00dJaya45!",
+    "database": "shen5725_db_shesterhood",
     "host": "localhost",
     "dialect": "mysql"
   }
